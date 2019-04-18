@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "module": "amd",
+    "charset":"utf-8",
+    "sourceMap": false,
+    "watch": true,
+    "removeComments":false,
+    // "allowJs":true,
+    // "checkJs": true,
+    "strict": true,
+    // "declaration":true,
+    // "outFile": "./dist/app.js",
+    "target": "es2015"
+  },
+  "include": [
+    "./src/**/*"
+  ],
+  "exclude": [
+  ]
+}
