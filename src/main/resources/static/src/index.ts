@@ -1,9 +1,6 @@
 //由于采用了 script defer, 生成的脚本文件将在页面加载完成后执行
 import {browser, getNonCache, getParameterValue, isBlankString, isObject} from "./base/utils";
-import {op_todo} from "./modules/todo";
-import {op_progressing} from "./modules/recent_progressing";
-import {op_starred} from "./modules/starred";
-import {op_done} from "./modules/done";
+import {componentOptions} from "./component";
 import Vue = vuejs.Vue;
 
 
@@ -15,6 +12,7 @@ let currentModule: string = "todo";
 export const $$ = mdui.JQ;
 export const router = new Map<string, (data: Response) => void>();
 export const action = new Map<string, string>();
+export const template = new Set<string>();
 export const vue = new Map<string, Vue>();
 
 //加载动画
@@ -86,6 +84,7 @@ function switchModule(module: string, checked: boolean = false) {
             }).then(() => {
                 let v = vue.get(module);//显示切换后内容,显示加载动画
                 window.setTimeout(function () {
+                    mdui.mutation("#" + module);
                     if (v) {
                         v.$data.seen = true;
                         stopLoad();
@@ -175,6 +174,11 @@ function setRouter(module: string, handler?: (data: Response) => void, dataURL?:
         dataURL = "data/" + module;
     }
     action.set(module, dataURL);
+
+    if (viewURL) {
+        template.add(viewURL);
+    }
+
 }
 
 
@@ -186,6 +190,14 @@ async function addModuleTemplates(): Promise<boolean> {
             return res.text()
         });
         obj.insertAdjacentHTML("beforeend", html);
+        let values = template.values();
+        html = "";
+        for (let t of values) {
+            html += await fetch(t).then(res => {
+                return res.text()
+            });
+        }
+        obj.insertAdjacentHTML("beforeend", html);
         addVue();
         return true;
     }
@@ -194,32 +206,24 @@ async function addModuleTemplates(): Promise<boolean> {
 
 
 function addVue() {
-    vue.set("todo", new Vue(op_todo));
-    vue.set("recent_progressing", new Vue(op_progressing));
-    vue.set("starred", new Vue(op_starred));
-    vue.set("done", new Vue(op_done));
-
-
-
-
-
+    let keys = router.keys();
+    for (let k of keys) {
+        let data = componentOptions.get(k);
+        if (data)
+            vue.set(k, new Vue(data));
+    }
 }
 
 
 function addRouters() {
 
-    //通用注册
-    document.querySelectorAll(".module_html").forEach(
-        el => setRouter(el.id)
-    );
 
-    //具体模块
+    //注册模块
     setRouter("todo", function (res: Response) {
 
     });
 
-
-    setRouter("recent_progressing", function (res: Response) {
+    setRouter("handled_progressing", function (res: Response) {
 
     });
 
@@ -230,8 +234,6 @@ function addRouters() {
     setRouter("starred", function (res: Response) {
 
     });
-
-
 
 
 }
@@ -259,7 +261,6 @@ checkOnline().then((online) => {
         if (addModuleTemplates()) {
             switchModule(getParameterValue(window.location.href, "curr_m"), true);
             window.history.replaceState(null, document.title, "index.html");
-            mdui.mutation();
         }
     } else {
         window.location.replace("html/login.html");
@@ -302,6 +303,9 @@ $$("#logout").on("click", function () {
         window.location.replace("html/login.html");
     });
 });
-//显示body
-$$(document.body).removeClass("v_hidden");
+mdui.mutation();
+
+
+
+
 

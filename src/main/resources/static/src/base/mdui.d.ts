@@ -702,7 +702,7 @@ declare namespace mdui {
 	export interface jQueryStatic extends jQueryObjectsOperations, jQueryExtendFunctions,
 		jQueryCallable, jQueryURLOperations, jQueryDataStore, jQueryOthers {}
 	export interface IMduiStatic extends MduiReloadMethods,MduiDialogs {// extends MduiDialogs my add
-        mutation():void //my add
+        mutation(selector?:string):void //my add
 		JQ: jQueryStatic
 		Collapse: Collapse
 		Haedroom: Headroom

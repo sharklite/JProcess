@@ -30,7 +30,7 @@ public class CommonsController {
 
     @RequestMapping("/loginCode")
     public String loginCode(HttpSession session) {
-        String code = StringUtil.digestHex(System.nanoTime() + "-" + Math.random());
+        String code = StringUtil.digestHex(String.valueOf(System.nanoTime()));
         session.setAttribute("loginCode", code);
         return code;
     }

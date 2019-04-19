@@ -3,7 +3,7 @@
     "outDir": "./dist/",
     "module": "amd",
     "charset":"utf-8",
-    "sourceMap": false,
+    "sourceMap": true,
     "watch": true,
     "removeComments":false,
     // "allowJs":true,

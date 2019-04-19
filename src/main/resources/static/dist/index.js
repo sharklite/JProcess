@@ -6,7 +6,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-define(["require", "exports", "./base/utils", "./modules/todo", "./modules/recent_progressing", "./modules/starred", "./modules/done"], function (require, exports, utils_1, todo_1, recent_progressing_1, starred_1, done_1) {
+define(["require", "exports", "./base/utils", "./component"], function (require, exports, utils_1, component_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     //-------------- begin -------------
@@ -17,6 +17,7 @@ define(["require", "exports", "./base/utils", "./modules/todo", "./modules/recen
     exports.$$ = mdui.JQ;
     exports.router = new Map();
     exports.action = new Map();
+    exports.template = new Set();
     exports.vue = new Map();
     //加载动画
     let loadTime;
@@ -82,6 +83,7 @@ define(["require", "exports", "./base/utils", "./modules/todo", "./modules/recen
                 }).then(() => {
                     let v = exports.vue.get(module); //显示切换后内容,显示加载动画
                     window.setTimeout(function () {
+                        mdui.mutation("#" + module);
                         if (v) {
                             v.$data.seen = true;
                             stopLoad();
@@ -165,6 +167,9 @@ define(["require", "exports", "./base/utils", "./modules/todo", "./modules/recen
             dataURL = "data/" + module;
         }
         exports.action.set(module, dataURL);
+        if (viewURL) {
+            exports.template.add(viewURL);
+        }
     }
     //添加视图组件
     function addModuleTemplates() {
@@ -175,6 +180,14 @@ define(["require", "exports", "./base/utils", "./modules/todo", "./modules/recen
                     return res.text();
                 });
                 obj.insertAdjacentHTML("beforeend", html);
+                let values = exports.template.values();
+                html = "";
+                for (let t of values) {
+                    html += yield fetch(t).then(res => {
+                        return res.text();
+                    });
+                }
+                obj.insertAdjacentHTML("beforeend", html);
                 addVue();
                 return true;
             }
@@ -182,18 +195,18 @@ define(["require", "exports", "./base/utils", "./modules/todo", "./modules/recen
         });
     }
     function addVue() {
-        exports.vue.set("todo", new Vue(todo_1.op_todo));
-        exports.vue.set("recent_progressing", new Vue(recent_progressing_1.op_progressing));
-        exports.vue.set("starred", new Vue(starred_1.op_starred));
-        exports.vue.set("done", new Vue(done_1.op_done));
+        let keys = exports.router.keys();
+        for (let k of keys) {
+            let data = component_1.componentOptions.get(k);
+            if (data)
+                exports.vue.set(k, new Vue(data));
+        }
     }
     function addRouters() {
-        //通用注册
-        document.querySelectorAll(".module_html").forEach(el => setRouter(el.id));
-        //具体模块
+        //注册模块
         setRouter("todo", function (res) {
         });
-        setRouter("recent_progressing", function (res) {
+        setRouter("handled_progressing", function (res) {
         });
         setRouter("done", function (res) {
         });
@@ -217,7 +230,6 @@ define(["require", "exports", "./base/utils", "./modules/todo", "./modules/recen
             if (addModuleTemplates()) {
                 switchModule(utils_1.getParameterValue(window.location.href, "curr_m"), true);
                 window.history.replaceState(null, document.title, "index.html");
-                mdui.mutation();
             }
         }
         else {
@@ -258,6 +270,6 @@ define(["require", "exports", "./base/utils", "./modules/todo", "./modules/recen
             window.location.replace("html/login.html");
         });
     });
-    //显示body
-    exports.$$(document.body).removeClass("v_hidden");
+    mdui.mutation();
 });
+//# sourceMappingURL=index.js.map

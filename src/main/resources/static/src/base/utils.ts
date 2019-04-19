@@ -157,11 +157,11 @@ export function toBoolean(v: any): boolean {
  * is a JSON-compliant type.
  * @Parameter JSON format is a object
  */
-export function isObject(v: any):boolean {
+export function isObject(v: any): boolean {
     return v != null && typeof v === 'object'
 }
 
-export function isDefined(v: any) :boolean{
+export function isDefined(v: any): boolean {
     return v != null && v != void 0;
 }
 
