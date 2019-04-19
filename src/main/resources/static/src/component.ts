@@ -1,7 +1,24 @@
 import ComponentOption = vuejs.ComponentOption;
+import {isBlankString} from "./base/utils";
+import {action, router, template} from "./index";
 
-export const componentOptions = new Map<String, ComponentOption>();
+export const componentOptions = new Map<string, ComponentOption>();
 
+function setRouter(module: string, handler?: (data: Response) => void, dataURL?: string, viewURL?: string) {
+    handler = handler ? handler : () => {
+        console.log("模块[" + module + "]未定义回调处理函数!")
+    };
+    router.set(module, handler);
+    if (!dataURL || isBlankString(dataURL)) {
+        dataURL = "data/" + module;
+    }
+    action.set(module, dataURL);
+
+    if (viewURL) {
+        template.add(viewURL);
+    }
+
+}
 
 function addOption(o: ComponentOption, module?: string) {
     let k;
@@ -17,8 +34,11 @@ function addOption(o: ComponentOption, module?: string) {
             k = (<Element>k).id;
         }
     }
-    componentOptions.set(k, op_done);
+    componentOptions.set(k, o);
 }
+
+//-----------------------
+
 
 //------------------------------------
 
@@ -28,10 +48,13 @@ const op_done = {
         seen: false
     },
     methods: {
-        
+
+    }
+    , updated: function () {
+        // stopLoad();
     }
 };
-addOption(op_done);
+
 
 // -------------
 
@@ -41,8 +64,11 @@ const op_handled_progressing = <ComponentOption>{
         seen: false
     },
     methods: {}
+    , updated: function () {
+        // stopLoad();
+    }
 };
-addOption(op_handled_progressing);
+
 
 //---------------------------
 
@@ -52,13 +78,16 @@ const op_starred = <ComponentOption>{
         seen: false
     },
     methods: {}
+    , updated: function () {
+        // stopLoad();
+    }
 };
 
-addOption(op_starred);
 
 //---------------------
 
-const op_todo = <ComponentOption>{
+let op_todo: ComponentOption;
+op_todo = <ComponentOption>{
     el: "#todo",
     data: {
         seen: false,
@@ -73,10 +102,40 @@ const op_todo = <ComponentOption>{
         }
     }
     , updated: function () {
-
+        // stopLoad();
     }
 };
 
-addOption(op_todo);
 
 //-------------------
+
+//注册模块
+export function addRouters() {
+
+
+    setRouter("todo", function (r: Response) {
+
+    });
+
+    setRouter("handled_progressing", function (r: Response) {
+
+    });
+
+    setRouter("done", function (r: Response) {
+
+    });
+
+    setRouter("starred", function (r: Response) {
+
+    });
+
+
+    addOption(op_done);
+
+    addOption(op_handled_progressing);
+
+    addOption(op_starred);
+
+    addOption(op_todo);
+
+}

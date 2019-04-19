@@ -5,7 +5,6 @@ export function hex_md(s: string): string {
     s = MD5CodeMaker.hex_md5(s);
     return MD5CodeMaker.hex_md5(s);
 }
-
 class MD5CodeMaker {
     /*
      * Configurable variables. You may need to tweak these to be compatible with

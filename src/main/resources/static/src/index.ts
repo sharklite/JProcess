@@ -1,6 +1,6 @@
 //由于采用了 script defer, 生成的脚本文件将在页面加载完成后执行
-import {browser, getNonCache, getParameterValue, isBlankString, isObject} from "./base/utils";
-import {componentOptions} from "./component";
+import {browser, getNonCache, isObject} from "./base/utils";
+import {addRouters, componentOptions} from "./component";
 import Vue = vuejs.Vue;
 
 
@@ -22,22 +22,24 @@ let loadingObj: HTMLElement = <HTMLElement>document.querySelector("#loading");
 let loading = false;
 
 function startLoad() {
+    if (loading)
+        return;
     loading = true;
     $$(loadingObj).removeClass("v_hidden");
     //加载时失败，动画关闭
     loadTime = window.setTimeout(function () {
         prevVue.$data.seen = true;
         stopLoad();
-    }, 5000);
+    }, 8000);
 }
 
-function stopLoad() {
+export function stopLoad() {
     loading = false;
     window.clearTimeout(loadTime);
     $$(loadingObj).addClass("v_hidden");
 }
 
-//加载动画 ----end
+//加载动画 ---- end -----
 
 const drawer = new mdui.Drawer('#drawer', {
     "overlay": false
@@ -53,14 +55,13 @@ window.addEventListener("popstate", function (evt) {
 function showViewByModule(module: string): boolean {
     let v = vue.get(currentModule);
     if (v) {
-        //隐藏原显示内容
-        v.$data.seen = false;
+        v.$data.seen = false;//隐藏原显示内容
         prevVue = v;
-        //切换显示的module
-        currentModule = module;
+        currentModule = module;//切换显示的module
         return true;
     } else {
         mdui.alert("加载页面超时，请刷新页面.");
+        console.log("没有id为:" + currentModule + "的元素,当前的点击模块为:" + module + ".")
     }
     return false;
 }
@@ -81,15 +82,15 @@ function switchModule(module: string, checked: boolean = false) {
                 let handler = router.get(module);
                 if (handler)
                     handler(res);
+                mdui.mutation("#" + module);
             }).then(() => {
-                let v = vue.get(module);//显示切换后内容,显示加载动画
                 window.setTimeout(function () {
-                    mdui.mutation("#" + module);
+                    let v = vue.get(module);//显示切换后内容,显示加载动画
                     if (v) {
                         v.$data.seen = true;
                         stopLoad();
                     }
-                }, 1200);
+                }, 960);
             });
         }
     });
@@ -126,12 +127,17 @@ function dialogLogout() {
 /**
  * autoTask 是否在定时器中执行的
  * **/
+
+
+
 async function checkOnline(): Promise<boolean> {
+
     return await fetch("commons/online?cache=" + getNonCache()).then(res => {
         return res.text();
     }).then(res => {
         return res == '1';
     });
+
 }
 
 //管理员身份线状态检查
@@ -165,25 +171,10 @@ function checkOnlineTask() {
 }
 
 
-function setRouter(module: string, handler?: (data: Response) => void, dataURL?: string, viewURL?: string) {
-    handler = handler ? handler : () => {
-        console.log("模块[" + module + "]未定义回调处理函数!")
-    };
-    router.set(module, handler);
-    if (!dataURL || isBlankString(dataURL)) {
-        dataURL = "data/" + module;
-    }
-    action.set(module, dataURL);
-
-    if (viewURL) {
-        template.add(viewURL);
-    }
-
-}
-
-
 //添加视图组件
-async function addModuleTemplates(): Promise<boolean> {
+async function addTemplates(): Promise<boolean> {
+    //模块注册
+    addRouters();
     let obj = document.body;
     if (obj) {
         let html = await fetch("html/module.html?t=" + getNonCache()).then(res => {
@@ -191,63 +182,31 @@ async function addModuleTemplates(): Promise<boolean> {
         });
         obj.insertAdjacentHTML("beforeend", html);
         let values = template.values();
-        html = "";
         for (let t of values) {
-            html += await fetch(t).then(res => {
+            html = await fetch(t).then(res => {
                 return res.text()
             });
+            obj.insertAdjacentHTML("beforeend", html);
         }
-        obj.insertAdjacentHTML("beforeend", html);
-        addVue();
+
+        let keys = componentOptions.keys();
+        for (let k of keys) {
+            let data = componentOptions.get(k);
+            if (data)
+                vue.set(k, new Vue(data));
+        }
+
         return true;
     }
     return false;
 }
 
 
-function addVue() {
-    let keys = router.keys();
-    for (let k of keys) {
-        let data = componentOptions.get(k);
-        if (data)
-            vue.set(k, new Vue(data));
-    }
-}
-
-
-function addRouters() {
-
-
-    //注册模块
-    setRouter("todo", function (res: Response) {
-
-    });
-
-    setRouter("handled_progressing", function (res: Response) {
-
-    });
-
-    setRouter("done", function (res: Response) {
-
-    });
-
-    setRouter("starred", function (res: Response) {
-
-    });
-
-
-}
-
-
 //-------------- end -------------
-
 
 /***
  * 以下内容需要再页面加载完成后执行，模拟在window.onload中执行故将js放在文档结束处
  ***/
-
-//模块注册
-addRouters();
 //开始定时检查online
 checkOnlineTask();
 //检查权限
@@ -257,17 +216,19 @@ checkAdmin();
 //登录时检测一次在线状态和加载视图
 checkOnline().then((online) => {
     if (online) {
-        //添加视图组件后
-        if (addModuleTemplates()) {
-            switchModule(getParameterValue(window.location.href, "curr_m"), true);
-            window.history.replaceState(null, document.title, "index.html");
-        }
+        addTemplates().then(added => {
+            //添加视图组件后
+            if (added) {
+                switchModule(currentModule, true);
+                window.history.replaceState(null, document.title, "index.html");
+                $$(document.body).removeClass("v_hidden");
+            }
+        });
     } else {
         window.location.replace("html/login.html");
     }
 
 });
-
 
 $$('#drawer').find("a.mdui-list-item").on("mouseover", function () {
     $$(this).find(".small_icon").removeClass("v_hidden");

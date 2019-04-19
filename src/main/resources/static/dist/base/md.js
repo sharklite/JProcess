@@ -1,28 +1,16 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    /**
-     * Created by sharklite on 2015/9/24 0024.
-     */
     function hex_md(s) {
         s = MD5CodeMaker.hex_md5(s);
         return MD5CodeMaker.hex_md5(s);
     }
     exports.hex_md = hex_md;
     class MD5CodeMaker {
-        /* bits per input character. 8 - ASCII; 16 - Unicode      */
-        /*
-         * These are thestatics you'll usually want to call
-         * They take string arguments and return either hex or base-64 encoded strings
-         */
         static hex_md5(s) {
             return MD5CodeMaker.binl2hex(MD5CodeMaker.core_md5(MD5CodeMaker.str2binl(s), s.length * MD5CodeMaker.chrsz));
         }
-        /*
-         * Calculate the MD5 of an array of little-endian words, and a bit length
-         */
         static core_md5(x, len) {
-            /* append padding */
             x[len >> 5] |= 0x80 << ((len) % 32);
             x[(((len + 64) >>> 9) << 4) + 14] = len;
             let a = 1732584193;
@@ -105,9 +93,6 @@ define(["require", "exports"], function (require, exports) {
             }
             return Array(a, b, c, d);
         }
-        /*
-         * Thesestatics implement the four basic operations the algorithm uses.
-         */
         static md5_cmn(q, a, b, x, s, t) {
             return MD5CodeMaker.safe_add(MD5CodeMaker.bit_rol(MD5CodeMaker.safe_add(MD5CodeMaker.safe_add(a, q), MD5CodeMaker.safe_add(x, t)), s), b);
         }
@@ -123,25 +108,14 @@ define(["require", "exports"], function (require, exports) {
         static md5_ii(a, b, c, d, x, s, t) {
             return MD5CodeMaker.md5_cmn(c ^ (b | (~d)), a, b, x, s, t);
         }
-        /*
-         * Add integers, wrapping at 2^32. This uses 16-bit operations internally
-         * to work around bugs in some JS interpreters.
-         */
         static safe_add(x, y) {
             let lsw = (x & 0xFFFF) + (y & 0xFFFF);
             let msw = (x >> 16) + (y >> 16) + (lsw >> 16);
             return (msw << 16) | (lsw & 0xFFFF);
         }
-        /*
-         * Bitwise rotate a 32-bit number to the left.
-         */
         static bit_rol(num, cnt) {
             return (num << cnt) | (num >>> (32 - cnt));
         }
-        /*
-         * Convert a string to an array of little-endian words
-         * If chrsz is ASCII, characters >255 have their hi-byte silently ignored.
-         */
         static str2binl(str) {
             let bin = new Array();
             let mask = (1 << MD5CodeMaker.chrsz) - 1;
@@ -149,9 +123,6 @@ define(["require", "exports"], function (require, exports) {
                 bin[i >> 5] |= (str.charCodeAt(i / MD5CodeMaker.chrsz) & mask) << (i % 32);
             return bin;
         }
-        /*
-         * Convert an array of little-endian words to a hex string.
-         */
         static binl2hex(binarray) {
             let hex_tab = MD5CodeMaker.hexcase ? "0123456789ABCDEF" : "0123456789abcdef";
             let str = "";
@@ -162,12 +133,7 @@ define(["require", "exports"], function (require, exports) {
             return str;
         }
     }
-    /*
-     * Configurable variables. You may need to tweak these to be compatible with
-     * the server-side, but the defaults work in most cases.
-     */
     MD5CodeMaker.hexcase = 0;
-    /* hex output format. 0 - lowercase; 1 - uppercase        */
     MD5CodeMaker.chrsz = 8;
 });
 //# sourceMappingURL=md.js.map

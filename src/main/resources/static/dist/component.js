@@ -1,7 +1,20 @@
-define(["require", "exports"], function (require, exports) {
+define(["require", "exports", "./base/utils", "./index"], function (require, exports, utils_1, index_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.componentOptions = new Map();
+    function setRouter(module, handler, dataURL, viewURL) {
+        handler = handler ? handler : () => {
+            console.log("模块[" + module + "]未定义回调处理函数!");
+        };
+        index_1.router.set(module, handler);
+        if (!dataURL || utils_1.isBlankString(dataURL)) {
+            dataURL = "data/" + module;
+        }
+        index_1.action.set(module, dataURL);
+        if (viewURL) {
+            index_1.template.add(viewURL);
+        }
+    }
     function addOption(o, module) {
         let k;
         if (module) {
@@ -19,37 +32,37 @@ define(["require", "exports"], function (require, exports) {
                 k = k.id;
             }
         }
-        exports.componentOptions.set(k, op_done);
+        exports.componentOptions.set(k, o);
     }
-    //------------------------------------
     const op_done = {
         el: "#done",
         data: {
             seen: false
         },
-        methods: {}
+        methods: {},
+        updated: function () {
+        }
     };
-    addOption(op_done);
-    // -------------
     const op_handled_progressing = {
         el: "#handled_progressing",
         data: {
             seen: false
         },
-        methods: {}
+        methods: {},
+        updated: function () {
+        }
     };
-    addOption(op_handled_progressing);
-    //---------------------------
     const op_starred = {
         el: "#starred",
         data: {
             seen: false
         },
-        methods: {}
+        methods: {},
+        updated: function () {
+        }
     };
-    addOption(op_starred);
-    //---------------------
-    const op_todo = {
+    let op_todo;
+    op_todo = {
         el: "#todo",
         data: {
             seen: false,
@@ -66,7 +79,20 @@ define(["require", "exports"], function (require, exports) {
         updated: function () {
         }
     };
-    addOption(op_todo);
+    function addRouters() {
+        setRouter("todo", function (r) {
+        });
+        setRouter("handled_progressing", function (r) {
+        });
+        setRouter("done", function (r) {
+        });
+        setRouter("starred", function (r) {
+        });
+        addOption(op_done);
+        addOption(op_handled_progressing);
+        addOption(op_starred);
+        addOption(op_todo);
+    }
+    exports.addRouters = addRouters;
 });
-//-------------------
 //# sourceMappingURL=component.js.map

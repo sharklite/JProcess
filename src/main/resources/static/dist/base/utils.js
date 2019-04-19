@@ -5,15 +5,14 @@ define(["require", "exports"], function (require, exports) {
         let o = {};
         let ua = window.navigator.userAgent.toLowerCase();
         let s;
-        //顺序不能变
-        (s = ua.match(/rv:([\d.]+)\) like gecko/)) ? o.ie = s[1] : //iE 6~10
-            (s = ua.match(/msie ([\d.]+)/)) ? o.ie = s[1] : //IE 11
-                (s = ua.match(/firefox\/([\d.]+)/)) ? o.firefox = s[1] : //FireFox
-                    (s = ua.match(/edge\/([\d.]+)/)) ? o.edge = s[1] : //Edge
-                        (s = ua.match(/opr\/([\d.]+)/)) ? o.opera = s[1] : //Opera with chromium
-                            (s = ua.match(/chrome\/([\d.]+)/)) ? o.chrome = s[1] : //Chrome
-                                (s = ua.match(/opera.([\d.]+)/)) ? o.opera = s[1] : //Opera
-                                    (s = ua.match(/version\/([\d.]+).*safari/)) ? o.safari = s[1] : 0; //Safari
+        (s = ua.match(/rv:([\d.]+)\) like gecko/)) ? o.ie = s[1] :
+            (s = ua.match(/msie ([\d.]+)/)) ? o.ie = s[1] :
+                (s = ua.match(/firefox\/([\d.]+)/)) ? o.firefox = s[1] :
+                    (s = ua.match(/edge\/([\d.]+)/)) ? o.edge = s[1] :
+                        (s = ua.match(/opr\/([\d.]+)/)) ? o.opera = s[1] :
+                            (s = ua.match(/chrome\/([\d.]+)/)) ? o.chrome = s[1] :
+                                (s = ua.match(/opera.([\d.]+)/)) ? o.opera = s[1] :
+                                    (s = ua.match(/version\/([\d.]+).*safari/)) ? o.safari = s[1] : 0;
         if (o.ie)
             o.name = "ie";
         else
@@ -32,15 +31,11 @@ define(["require", "exports"], function (require, exports) {
         return cache++;
     }
     exports.getNonCache = getNonCache;
-    //url 操作
     function getParameterValue(url, parameterName) {
         let r = getURLParameters(url)[parameterName];
         return isDefined(r) ? r : "";
     }
     exports.getParameterValue = getParameterValue;
-    //替换URL中的参数
-    // pathname + [search] + [hash]
-    // cannot set parameter to hash
     function setParam(url, name, value) {
         if (!url || isBlankString(url))
             return ("?" + name + "=" + value);
@@ -74,7 +69,6 @@ define(["require", "exports"], function (require, exports) {
         return url;
     }
     exports.setParams = setParams;
-    //财务转中文大写
     function decimalToChinese(money) {
         money = money.toString().replace(/[^\d.]/g, "").replace(/(\.\d{1,3}).+$/, "$1");
         let num = parseFloat(money);
@@ -107,7 +101,6 @@ define(["require", "exports"], function (require, exports) {
         return money;
     }
     exports.decimalToChinese = decimalToChinese;
-    //format
     function dateFormat(fmt, date = new Date()) {
         let o = {
             "M+": date.getMonth() + 1,
@@ -116,7 +109,7 @@ define(["require", "exports"], function (require, exports) {
             "m+": date.getMinutes(),
             "s+": date.getSeconds(),
             "q+": Math.floor((date.getMonth() + 3) / 3),
-            "S": date.getMilliseconds() //毫秒
+            "S": date.getMilliseconds()
         };
         if (/(y+)/.test(fmt))
             fmt = fmt.replace(RegExp.$1, (date.getFullYear().toString()).substr(4 - RegExp.$1.length));
@@ -126,7 +119,6 @@ define(["require", "exports"], function (require, exports) {
         return fmt;
     }
     exports.dateFormat = dateFormat;
-    //得到指定对象的指定类型的父对象
     function getParentElement(element, parentType) {
         if (!parentType || !element)
             return null;
@@ -141,12 +133,6 @@ define(["require", "exports"], function (require, exports) {
         return v === true || toInt(v) == 1 || String(v).toLowerCase().trim() === "true";
     }
     exports.toBoolean = toBoolean;
-    /**
-     * Quick object check - this is primarily used to tell
-     * Objects from primitive values when we know the value
-     * is a JSON-compliant type.
-     * @Parameter JSON format is a object
-     */
     function isObject(v) {
         return v != null && typeof v === 'object';
     }
@@ -155,12 +141,10 @@ define(["require", "exports"], function (require, exports) {
         return v != null && v != void 0;
     }
     exports.isDefined = isDefined;
-    //是否为空白字符串
     function isBlankString(s) {
         return s === '' || s.trim() === '';
     }
     exports.isBlankString = isBlankString;
-    //一个字符串转换为数值型,否则返回本身或默认值
     function toNumber(s, defaultVal = 0) {
         let v = parseFloat(s);
         return isNaN(v) ? defaultVal : v;
@@ -189,16 +173,6 @@ define(["require", "exports"], function (require, exports) {
         return o;
     }
     exports.getURLParameters = getURLParameters;
-    // function randomString(len: number = 0): string {
-    //     let s = "";
-    //     len = Math.floor(Math.abs((len)));
-    //     for (let i = 0; i < len; i++) {
-    //         s += Math.floor(Math.random() * 10);
-    //     }
-    //     return s;
-    // }
-    ///////
-    //mdui缺少的api
     function mduiDialog(content, btnText = '关闭', onClick, onClosed) {
         let param = {
             title: '提示',

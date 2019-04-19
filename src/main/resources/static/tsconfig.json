@@ -5,7 +5,7 @@
     "charset":"utf-8",
     "sourceMap": true,
     "watch": true,
-    "removeComments":false,
+    "removeComments":true,
     // "allowJs":true,
     // "checkJs": true,
     "strict": true,

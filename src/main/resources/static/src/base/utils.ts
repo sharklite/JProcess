@@ -201,15 +201,6 @@ export function getURLParameters(url: string): { [key: string]: string } {
 }
 
 
-// function randomString(len: number = 0): string {
-//     let s = "";
-//     len = Math.floor(Math.abs((len)));
-//     for (let i = 0; i < len; i++) {
-//         s += Math.floor(Math.random() * 10);
-//     }
-//     return s;
-// }
-
 ///////
 //mdui缺少的api
 export function mduiDialog(content: string, btnText: string = '关闭', onClick?: () => any, onClosed?: () => any) {

@@ -3,29 +3,21 @@ define(["require", "exports", "./base/md", "./base/utils"], function (require, e
     Object.defineProperty(exports, "__esModule", { value: true });
     const $$ = mdui.JQ;
     let robot = true;
-    let loginCode = ""; //表示只能从这个页面登录的验证码
+    let loginCode = "";
     $$(function () {
         let inst = new mdui.Dialog("#login_dial", {
-            /** 打开对话框时是否显示遮罩。 */
             overlay: true,
-            /** 打开对话框时是否添加 url hash，若为 true，则打开对话框后可用过浏览器的后退按钮或 Android 的返回键关闭对话框。 */
             history: false,
-            /** 是否模态化对话框。为 false 时点击对话框外面的区域时关闭对话框，否则不关闭。 */
             modal: true,
-            /** 按下 Esc 键时是否关闭对话框。 */
             closeOnEsc: false,
-            /** 按下取消按钮时是否关闭对话框。 */
             closeOnCancel: false,
-            /** 按下确认按钮时是否关闭对话框。 */
             closeOnConfirm: false,
-            /** 关闭对话框后是否自动销毁对话框。 */
             destroyOnClosed: false
         });
         inst.open();
         fetch("../commons/loginCode").then(res => {
             return res.text();
         }).then(code => {
-            console.log(code);
             loginCode = code;
         }).catch(() => {
             loginCode = "";
@@ -33,7 +25,6 @@ define(["require", "exports", "./base/md", "./base/utils"], function (require, e
         $$("#reset_btn").on("click", function () {
             $$("#login_dial").find("input").val("");
         });
-        //人类行为检测
         window.addEventListener("mousemove", function () {
             robot = false;
         });

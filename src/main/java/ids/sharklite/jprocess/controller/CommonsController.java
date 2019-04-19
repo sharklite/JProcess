@@ -80,11 +80,9 @@ public class CommonsController {
             } else {
                 OnlineUser onlineUser = (OnlineUser) session.getAttribute("user");
                 String ip = HttpUtil.getRemoteHost(request);
-                if (onlineUser != null) {
-                    if (!ip.equals(onlineUser.getHost())) {
-                        map.put(HttpUtil.MESSAGE, "用户已登录!");
-                        return map;
-                    }
+                if (onlineUser != null && !ip.equals(onlineUser.getHost())) {
+                    map.put(HttpUtil.MESSAGE, "用户已登录!");
+                    return map;
                 } else {
                     onlineUser = onlineUserDao.findById(user.getId());
                     onlineUser.setHost(ip);

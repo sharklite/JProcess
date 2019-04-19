@@ -22,12 +22,9 @@ $$(function () {
         destroyOnClosed: false
     });
     inst.open();
-
-
     fetch("../commons/loginCode").then(res => {
         return res.text();
     }).then(code => {
-        console.log(code);
         loginCode = code;
     }).catch(() => {
         loginCode = "";
@@ -95,7 +92,3 @@ $$(function () {
         });
     }
 });
-
-
-
-
