@@ -1,18 +1,22 @@
-define(["require", "exports", "./base/utils", "./index"], function (require, exports, utils_1, index_1) {
+define(["require", "exports", "./base/utils"], function (require, exports, utils_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.router = new Map();
+    exports.action = new Map();
+    exports.template = new Set();
+    exports.vue = new Map();
     exports.componentOptions = new Map();
     function setRouter(module, handler, dataURL, viewURL) {
         handler = handler ? handler : () => {
             console.log("模块[" + module + "]未定义回调处理函数!");
         };
-        index_1.router.set(module, handler);
+        exports.router.set(module, handler);
         if (!dataURL || utils_1.isBlankString(dataURL)) {
             dataURL = "data/" + module;
         }
-        index_1.action.set(module, dataURL);
+        exports.action.set(module, dataURL);
         if (viewURL) {
-            index_1.template.add(viewURL);
+            exports.template.add(viewURL);
         }
     }
     function addOption(o, module) {

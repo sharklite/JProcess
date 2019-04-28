@@ -5,14 +5,11 @@ class UniqueIdGenerator {
 
 
     private static UniqueIdGenerator instance;
-    private final Object lock = new Object();
-    private short endIndex = 0; // as short 16bits 4 chars
-    private short middleIndex;
-    private String middle;
+    private int endIndex;
+
 
     private UniqueIdGenerator() {
-        middleIndex = (short) System.currentTimeMillis();
-
+        endIndex = (int) System.nanoTime();
     }
 
     static UniqueIdGenerator getInstance() {
@@ -30,11 +27,6 @@ class UniqueIdGenerator {
     }
 
 
-    private byte[] shortToBytes(short s) {
-        byte[] bs = new byte[Short.SIZE / Byte.SIZE];
-        return numberToBytes(s, bs);
-    }
-
     private byte[] intToBytes(int t) {
         byte[] bs = new byte[Integer.SIZE / Byte.SIZE];
         return numberToBytes(t, bs);
@@ -51,27 +43,13 @@ class UniqueIdGenerator {
     }
 
 
-    private String shortToHex(short s) {
-        return bytesToHexString(shortToBytes(s));
-    }
-
     private String intToHex(int t) {
         return bytesToHexString(intToBytes(t));
     }
 
-    //16 chars
+    //16 chars ,8 bytes
     synchronized String getUniqueId() {
-        String end;
-        int timestamp = (int) (System.currentTimeMillis() / 1000);//32bits ,8 chars
-        synchronized (lock) {
-            if (endIndex == 0) {
-                middle = shortToHex(middleIndex);
-                middleIndex = (short) ((timestamp % Byte.MAX_VALUE) + middleIndex + 1);
-            }
-            end = shortToHex(endIndex);
-            endIndex++;
-        }
-        return intToHex(timestamp) + middle + end;
+        return intToHex((int) (System.currentTimeMillis() / 1000)) + intToHex(++endIndex);
     }
 
 

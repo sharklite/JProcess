@@ -1,7 +1,10 @@
 import ComponentOption = vuejs.ComponentOption;
 import {isBlankString} from "./base/utils";
-import {action, router, template} from "./index";
-
+import Vue = vuejs.Vue;
+export const router = new Map<string, (data: Response) => void>();
+export const action = new Map<string, string>();
+export const template = new Set<string>();
+export const vue = new Map<string, Vue>();
 export const componentOptions = new Map<string, ComponentOption>();
 
 function setRouter(module: string, handler?: (data: Response) => void, dataURL?: string, viewURL?: string) {

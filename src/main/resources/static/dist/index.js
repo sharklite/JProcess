@@ -6,37 +6,44 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-define(["require", "exports", "./base/utils", "./component"], function (require, exports, utils_1, component_1) {
+define(["require", "exports", "./base/utils"], function (require, exports, utils_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const objTitle = document.querySelectorAll("title").item(0);
-    const objHeadlineTitle = document.querySelector("#headline_title");
+    const headTitle = document.querySelectorAll("title").item(0);
+    const headlineTitle = document.querySelector("#headline_title");
+    const main_container = document.getElementById("main_container");
     let currentModule = "todo";
     exports.$$ = mdui.JQ;
-    exports.router = new Map();
-    exports.action = new Map();
-    exports.template = new Set();
-    exports.vue = new Map();
-    let loadTime;
-    let prevVue;
-    let loadingObj = document.querySelector("#loading");
-    let loading = false;
-    function startLoad() {
-        if (loading)
-            return;
-        loading = true;
-        exports.$$(loadingObj).removeClass("v_hidden");
-        loadTime = window.setTimeout(function () {
-            prevVue.$data.seen = true;
-            stopLoad();
-        }, 8000);
-    }
-    function stopLoad() {
-        loading = false;
-        window.clearTimeout(loadTime);
-        exports.$$(loadingObj).addClass("v_hidden");
-    }
-    exports.stopLoad = stopLoad;
+    const load = (function () {
+        class Load {
+            constructor() {
+                this.loading = false;
+                this.loadTime = 0;
+                this.prevURL = "pages/blank.html";
+                this.loadingObj = document.getElementById("loading");
+                this.stop = () => {
+                    window.clearTimeout(this.loadTime);
+                    exports.$$(this.loadingObj).addClass("v_hidden");
+                    main_container.style.display = "block";
+                    this.loading = false;
+                };
+                this.start = () => {
+                    if (this.loading)
+                        return;
+                    main_container.style.display = "none";
+                    exports.$$(this.loadingObj).removeClass("v_hidden");
+                    this.prevURL = main_container.contentWindow.location.href;
+                    this.loading = true;
+                    this.loadTime = window.setTimeout(() => {
+                        if (this.loading)
+                            main_container.src = this.prevURL;
+                        this.stop();
+                    }, 8000);
+                };
+            }
+        }
+        return new Load();
+    }());
     const drawer = new mdui.Drawer('#drawer', {
         "overlay": false
     });
@@ -46,20 +53,6 @@ define(["require", "exports", "./base/utils", "./component"], function (require,
             switchModule(state["module"], true);
         }
     });
-    function showViewByModule(module) {
-        let v = exports.vue.get(currentModule);
-        if (v) {
-            v.$data.seen = false;
-            prevVue = v;
-            currentModule = module;
-            return true;
-        }
-        else {
-            mdui.alert("加载页面超时，请刷新页面.");
-            console.log("没有id为:" + currentModule + "的元素,当前的点击模块为:" + module + ".");
-        }
-        return false;
-    }
     function switchModule(module, checked = false) {
         checkOnline().then(online => {
             if (!online) {
@@ -67,24 +60,12 @@ define(["require", "exports", "./base/utils", "./component"], function (require,
                 return;
             }
             module = module ? module : currentModule;
-            checked = checked || (module !== currentModule && exports.router.has(module));
-            if (checked && showViewByModule(module)) {
-                startLoad();
-                let dataURL = exports.action.get(module) || ("data/" + module);
-                fetch(dataURL).then((res) => {
-                    let handler = exports.router.get(module);
-                    if (handler)
-                        handler(res);
-                    mdui.mutation("#" + module);
-                }).then(() => {
-                    window.setTimeout(function () {
-                        let v = exports.vue.get(module);
-                        if (v) {
-                            v.$data.seen = true;
-                            stopLoad();
-                        }
-                    }, 960);
-                });
+            checked = checked || (module !== currentModule);
+            if (checked) {
+                load.start();
+                currentModule = module;
+                main_container.src = "pages/module/" + module + ".html";
+                window.history.pushState({ "module": module }, document.title, window.location.href);
             }
         });
         if (utils_1.browser.mobile) {
@@ -108,7 +89,7 @@ define(["require", "exports", "./base/utils", "./component"], function (require,
                 }
             ],
             onClosed: function () {
-                window.location.replace("html/login.html");
+                window.location.replace("pages/login.html");
             }
         });
     }
@@ -147,79 +128,71 @@ define(["require", "exports", "./base/utils", "./component"], function (require,
             });
         }, 1000 * 60 * 30);
     }
-    function addTemplates() {
-        return __awaiter(this, void 0, void 0, function* () {
-            component_1.addRouters();
-            let obj = document.body;
-            if (obj) {
-                let html = yield fetch("html/module.html?t=" + utils_1.getNonCache()).then(res => {
-                    return res.text();
-                });
-                obj.insertAdjacentHTML("beforeend", html);
-                let values = exports.template.values();
-                for (let t of values) {
-                    html = yield fetch(t).then(res => {
-                        return res.text();
-                    });
-                    obj.insertAdjacentHTML("beforeend", html);
-                }
-                let keys = component_1.componentOptions.keys();
-                for (let k of keys) {
-                    let data = component_1.componentOptions.get(k);
-                    if (data)
-                        exports.vue.set(k, new Vue(data));
-                }
-                return true;
+    exports.$$(() => {
+        checkOnlineTask();
+        checkAdmin();
+        checkOnline().then((online) => {
+            if (online) {
+                switchModule(currentModule, true);
+                window.history.replaceState(null, document.title, "index.html");
+                exports.$$(document.body).removeClass("v_hidden");
+            }
+            else {
+                window.location.replace("pages/login.html");
+            }
+        });
+        exports.$$('#drawer').find("a.mdui-list-item").on("mouseover", function () {
+            exports.$$(this).find(".small_icon").removeClass("v_hidden");
+        }).on("mouseout", function () {
+            exports.$$(this).find(".small_icon").addClass("v_hidden");
+        }).on("click", function () {
+            if (load.loading)
+                return false;
+            let link = this;
+            exports.$$('#drawer').find(".mdui-list-item-active").removeClass("mdui-list-item-active");
+            exports.$$(link).addClass("mdui-list-item-active");
+            let module = link.getAttribute("data-module");
+            if (module) {
+                headTitle.innerHTML = headlineTitle.innerHTML = exports.$$(link).find(".mdui-list-item-content").text();
+                switchModule(module);
+            }
+            else {
+                let target = link.getAttribute("target") || link.id;
+                window.open(link.href, target);
             }
             return false;
         });
-    }
-    checkOnlineTask();
-    checkAdmin();
-    checkOnline().then((online) => {
-        if (online) {
-            addTemplates().then(added => {
-                if (added) {
-                    switchModule(currentModule, true);
-                    window.history.replaceState(null, document.title, "index.html");
-                    exports.$$(document.body).removeClass("v_hidden");
-                }
-            });
-        }
-        else {
-            window.location.replace("html/login.html");
-        }
-    });
-    exports.$$('#drawer').find("a.mdui-list-item").on("mouseover", function () {
-        exports.$$(this).find(".small_icon").removeClass("v_hidden");
-    }).on("mouseout", function () {
-        exports.$$(this).find(".small_icon").addClass("v_hidden");
-    }).on("click", function () {
-        if (loading)
-            return false;
-        let link = this;
-        exports.$$('#drawer').find(".mdui-list-item-active").removeClass("mdui-list-item-active");
-        exports.$$(link).addClass("mdui-list-item-active");
-        let module = link.getAttribute("data-module");
-        if (module) {
-            objTitle.innerHTML = objHeadlineTitle.innerHTML = exports.$$(link).find(".mdui-list-item-content").text();
-            window.history.pushState({ "module": module }, document.title, window.location.href);
-            switchModule(module);
-        }
-        else {
-            let target = link.getAttribute("target") || link.id;
-            window.open(link.href, target);
-        }
-        return false;
-    });
-    exports.$$("#settings").on("click", function () {
-        mdui.alert("待建设");
-    });
-    exports.$$("#logout").on("click", function () {
-        fetch("commons/logout").then(() => {
-            window.location.replace("html/login.html");
+        exports.$$("#settings").on("click", function () {
+            mdui.alert("待建设");
         });
+        exports.$$("#logout").on("click", function () {
+            fetch("commons/logout").then(() => {
+                window.location.replace("pages/login.html");
+            });
+        });
+        (function (ifr) {
+            let height = 0;
+            function reInitContainerIframe() {
+                if (height != parseInt(ifr.style.height)) {
+                    let contentWindow = ifr.contentWindow;
+                    let bHeight = contentWindow.document.body.scrollHeight;
+                    let dHeight = contentWindow.document.documentElement.scrollHeight;
+                    height = Math.max(bHeight, dHeight);
+                    main_container.style.height = height + "px";
+                }
+            }
+            window.setInterval(reInitContainerIframe, 1200);
+            ifr.onload = function () {
+                reInitContainerIframe();
+                window.setTimeout(function () {
+                    load.stop();
+                }, 800);
+            };
+            window.onresize = function () {
+                reInitContainerIframe();
+            };
+        }(main_container));
+        mdui.mutation();
     });
-    mdui.mutation();
 });
 //# sourceMappingURL=index.js.map

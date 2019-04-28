@@ -37,8 +37,8 @@ public class CommonsController {
 
 
     @RequestMapping("/online")
-    public int online(HttpSession session) {
-        return session.getAttribute("user") == null ? 0 : 1;
+    public String online(HttpSession session) {
+        return session.getAttribute("user") == null ? "0" : "1";
     }
 
     @RequestMapping("/hrAdmin")

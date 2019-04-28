@@ -1,0 +1,156 @@
+
+
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+  <meta content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"/>
+  <meta content="webkit" name="renderer">
+  <link href="../../res/mdui/css/mdui.min.css" rel="stylesheet">
+  <script src="../../res/mdui/js/mdui.min.js"></script>
+  <script defer data-main="../dist/modules/todo.js" src="../../res/js/require.min.js"></script>
+</head>
+
+<body class="mdui-appbar-with-toolbar  mdui-theme-primary-indigo mdui-theme-accent-pink">
+
+
+
+<div id="todo" class="mdui-container doc-container doc-no-cover">
+  <div class="mdui-container doc-container doc-no-cover">
+    <h1 class="doc-title mdui-text-color-theme">安装</h1>
+    <div class="doc-intro mdui-typo">
+      <p>我们提供了多种方式来获取 MDUI，且支持 CommonJS、AMD 模块规范。</p>
+    </div>
+
+    <nav class="doc-toc mdui-text-color-theme">
+      <ul>
+        <li>
+          <a data-scroll href="#install">获取 MDUI</a>
+          <ul>
+            <li><a data-scroll href="#download">下载文件</a></li>
+            <li><a data-scroll href="#cdn">CDN</a></li>
+            <li><a data-scroll href="#bower">Bower</a></li>
+            <li><a data-scroll href="#npm">NPM</a></li>
+          </ul>
+        </li>
+        <!--<li><a data-scroll href="#custom">在线定制</a></li>-->
+        <li><a data-scroll href="#build">自定义构建</a></li>
+        <li><a data-scroll href=""></a></li>
+      </ul>
+    </nav>
+
+    <div class="doc-chapter">
+      <div class="mdui-typo">
+        <h2 class="doc-chapter-title doc-chapter-title-first mdui-text-color-theme">获取 MDUI <a class="doc-anchor" id="install"></a></h2>
+      </div>
+
+      <div class="mdui-typo">
+        <h4 class="doc-article-title">下载文件 <a class="doc-anchor" id="download"></a></h4>
+        <p>你可以直接从 MDUI 官网下载打包后的文件，其中包含了压缩过的和未压缩过的 CSS 和 JavaScript 文件，以及 Roboto 字体文件和 Material Icons 图标文件。</p>
+
+        <a href="//mdui.org" target="_blank" class="mdui-btn mdui-btn-raised mdui-color-theme-accent mdui-ripple">打开 MDUI 官网</a>
+      </div>
+
+      <div class="mdui-typo">
+        <h4 class="doc-article-title">CDN <a class="doc-anchor" id="cdn"></a></h4>
+        <p>cdnjs （国外访问速度较快）</p>
+        <pre><code class="lang-html">&lt;link rel=&quot;stylesheet&quot; href=&quot;//cdnjs.cloudflare.com/ajax/libs/mdui/0.4.2/css/mdui.min.css&quot;&gt;
+          &lt;script src=&quot;//cdnjs.cloudflare.com/ajax/libs/mdui/0.4.2/js/mdui.min.js&quot;&gt;&lt;/script&gt;</code></pre>
+        <p>css.net （国内访问速度较快）</p>
+        <pre><code class="lang-html">&lt;link rel=&quot;stylesheet&quot; href=&quot;//cdnjs.loli.net/ajax/libs/mdui/0.4.2/css/mdui.min.css&quot;&gt;
+          &lt;script src=&quot;//cdnjs.loli.net/ajax/libs/mdui/0.4.2/js/mdui.min.js&quot;&gt;&lt;/script&gt;</code></pre>
+      </div>
+
+      <div class="mdui-typo">
+        <h4 class="doc-article-title">Bower <a class="doc-anchor" id="bower"></a></h4>
+        <p>执行下面的命令安装 MDUI：</p>
+        <pre><code>bower install mdui --save</code></pre>
+      </div>
+
+      <div class="mdui-typo">
+        <h4 class="doc-article-title">NPM <a class="doc-anchor" id="npm"></a></h4>
+        <p>执行下面的命令安装 MDUI：</p>
+        <pre><code>npm install mdui --save</code></pre>
+      </div>
+
+      <!--<div class="mdui-typo">
+        <h4 class="doc-article-title">在线定制 <a class="doc-anchor" id="custom"></a></h4>
+        <p>我们提供了在线打包工具，使你无需掌握 Gulp，只需点几下鼠标就能完成 MDUI 的定制。</p>
+        <a href="./custom" class="mdui-btn mdui-btn-raised mdui-color-theme-accent mdui-ripple">开始定制</a>
+      </div>-->
+
+      <div class="mdui-typo">
+        <h2 class="doc-chapter-title mdui-text-color-theme">自定义构建 <a class="doc-anchor" id="build"></a></h2>
+        <p>MDUI 使用 <a href="http://gulpjs.com/" target="_blank">Gulp</a> 进行构建。从 <a href="https://github.com/zdhxiong/mdui" target="_blank">Github</a> 获得源代码后，可以执行下列 gulp 命令进行构建。</p>
+        <div class="mdui-table-fluid">
+          <table class="mdui-table">
+            <thead>
+            <tr>
+              <th style="min-width: 180px;">命令</th>
+              <th>说明</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td><code>gulp version</code></td>
+              <td>输出当前版本号</td>
+            </tr>
+            <tr>
+              <td><code>gulp watch</code></td>
+              <td>在源码发生修改时执行打包命令</td>
+            </tr>
+            <tr>
+              <td><code>gulp build-css</code></td>
+              <td>打包 CSS 文件，打包后的文件位于 <code>dist/css/</code> 目录中</td>
+            </tr>
+            <tr>
+              <td><code>gulp build-js</code></td>
+              <td>打包 JavaScript 文件，打包后的文件位于 <code>dist/js/</code> 目录中</td>
+            </tr>
+            <tr>
+              <td><code>gulp build</code></td>
+              <td>打包所有文件，打包后的文件位于 <code>dist/</code> 目录中</td>
+            </tr>
+            <tr>
+              <td><code>gulp clean-css</code></td>
+              <td>清空 <code>dist/css/</code> 目录下的 CSS 文件</td>
+            </tr>
+            <tr>
+              <td><code>gulp clean-js</code></td>
+              <td>清空 <code>dist/js/</code> 目录下的 JavaScript 文件</td>
+            </tr>
+            <tr>
+              <td><code>gulp custom</code></td>
+              <td>进行定制打包，打包后的文件位于 <code>custom/</code> 目录中。该命令需要包含参数，参数说明如下：
+                <pre><code>gulp custom
+                      -modules:用“,”分隔的模块名
+                      -primary-colors:用“,”分隔的主色名
+                      -accent-colors:用“,”分隔的强调色名
+                      -color-degrees:用“,”分隔的颜色饱和度
+                      -layout-dark</code></pre>
+              </td>
+            </tr>
+            <tr>
+              <td><code>gulp clean-custom</code></td>
+              <td>清空 <code>custom/</code> 目录下的所有文件</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+</body>
+</html>
+
+
+
+
